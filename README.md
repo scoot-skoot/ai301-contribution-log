@@ -1,4 +1,4 @@
-# Contribution [#]: [Issue Title]
+# Contribution #943: Optimize receive_msg ioctl to copy only actual received entries
 
 **Contribution Number:** 1
 **Student:** David Ajao
