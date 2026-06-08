@@ -8,9 +8,9 @@
 ---
 
 ## Why I Chose This Issue
--
+
 I really enjoy learning a lot about low level systems theory and have been looking for good opportunities to put the knowledge into practice. As such, the issue being a well-defined performance engineer problem makes it one of the best issues, I could start with. Through this project, I want to gain experience working with larger, unfamiliar codebases and get really quick at parsing code. I also hope to get a feel for some of the differences between the theory and application of low-level software. I am also looking forward to branching out of the C++ STL.
----
+
 
 ## Understanding the Issue
 
