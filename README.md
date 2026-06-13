@@ -16,42 +16,75 @@ I really enjoy learning a lot about low level systems theory and have been looki
 
 ### Problem Description
 
-[In your own words, what's broken or missing?]
+At a very high level, the goal of this contribution is to optimize the IO Control data transfer between the kernel and the user. Currently, the implementation transfers the full buffer from the kernel to the user, even when there is only n pieces of data (where n < buffer size). This is i0efficient as we end up transferring unused array capacity, which artificially constraints the programs efficiency.
 
 ### Expected Behavior
 
-[What should happen?]
+Ideally, rather than copying the full buffer every time, the program should be dynamic and allow for data transfer of variable lengths between the kernel and the user.
 
 ### Current Behavior
 
-[What actually happens?]
+The implementation currently copies the entire ioctl_recieve_msg_args union back to the userspace, regardless of the value of ret_entry_num (number of filled buffer spots)
 
 ### Affected Components
 
 [Which parts of the codebase are involved?]
 
----
+The two main files of interest are
+- agnocast_ioctl.c
+- agnocast.h
+  
+The functions/objects of interest are
+- recieve_msg_cmd()
+- recieve_msg_core()
+- union ioctl_recieve_msg_args
+- copy_to_user(arg, &recieve_msg_args, sizeof(recieve_msg_args))
 
 ## Reproduction Process
+This is not so much a bug as a feature implementation, however I believe I can compare latency and runtime differences using the repo's own testing suite or RO2.
 
 ### Environment Setup
-
-[Notes on setting up your local development environment - challenges you faced, how you solved them]
+As this is my first time working with kernels in real codebases, I naively though that I would just clone the repo in my WSL and get going. What I observed however is that WSL is not a great environment for kernel work as many of the packages and depdencies needed for the project do not operate well with WSL's kernel (YMMV).
+As this is repo primarily serves as middleware between the kernel and the userspace, I had to set up a virtual machine running Ubuntu.
+Other than that small hiccup, the set up and build was actually suprisingly smooth. I had the same depency hiccups that is almost customary when building projects for the first time, but it was far less and a lot easier to debug than JS/Typescript projects so that was awesome.
+Overall, after the virtual machine system was setup, from cloning to building was less than 2 hours! :)
 
 ### Steps to Reproduce
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. Build Agnocast
+2. Load kernel module.
+3. Run recieve benchmark/test
+4. Observe receieve_msg ioctl behavior
+5. Compare about of data copied vs ret_entry_num
 
 ### Reproduction Evidence
 
-- **Commit showing reproduction:** [Link to commit in your fork]
-- **Screenshots/logs:** [If applicable]
-- **My findings:** [What you discovered during reproduction]
+##### Relevant code path identified
+'''
+if (ret == 0) {
+    if (copy_to_user(arg,
+                     &receive_msg_args,
+                     sizeof(receive_msg_args)))
+        return -EFAULT;
+}
+'''
+##### Findings
 
----
+The entire ioctl_recieve_msg_args union is copied back to the userspace regardless of the value of ret_entr_nums
 
+##### Impact
+Given that recieve_msg_core only fills the first ret_entry_nums entries of the 
+ret_entry_ids[] and ret_entry_addrs[] (members of the ioctl_recieve_msg_args union) this makes serialization proportional to the buffer size, rather than the amount of data filled.
+
+##### Future Benchmark Results
+Before:
+X ms
+
+After:
+Y ms
+
+Improvement:
+Z%
 ## Solution Approach
 
 ### Analysis
