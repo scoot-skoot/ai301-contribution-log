@@ -60,23 +60,25 @@ Overall, after the virtual machine system was setup, from cloning to building wa
 ### Reproduction Evidence
 
 ##### Relevant code path identified
-'''
+
+```
 if (ret == 0) {
     if (copy_to_user(arg,
                      &receive_msg_args,
                      sizeof(receive_msg_args)))
         return -EFAULT;
 }
-'''
-##### Findings
+```
+
+#### Findings
 
 The entire ioctl_recieve_msg_args union is copied back to the userspace regardless of the value of ret_entr_nums
 
-##### Impact
+#### Impact
 Given that recieve_msg_core only fills the first ret_entry_nums entries of the 
 ret_entry_ids[] and ret_entry_addrs[] (members of the ioctl_recieve_msg_args union) this makes serialization proportional to the buffer size, rather than the amount of data filled.
 
-##### Future Benchmark Results
+#### Future Benchmark Results
 Before:
 X ms
 
