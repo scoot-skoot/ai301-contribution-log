@@ -28,8 +28,6 @@ The implementation currently copies the entire ioctl_recieve_msg_args union back
 
 ### Affected Components
 
-[Which parts of the codebase are involved?]
-
 The two main files of interest are
 - agnocast_ioctl.c
 - agnocast.h
