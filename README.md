@@ -174,11 +174,14 @@ The main design decision was to avoid changing the ABI. Instead of modifying the
 Previously, the full fixed-size receive buffer was copied regardless of the number of valid entries. This change copies only the valid prefix based on ret_entry_num.
 
 **Maintainer Feedback:**
-- [Date]: [Summary of feedback received]
-- [Date]: [How you addressed it]
+-6/15/26: The mainter explained that while the optimzation was reasonable, since the issue was posted the surrounding architecture had changed so that the optimization no longer made sense.
+More specifically, since the message reception and callback execution were now combined, the previous lock contention that inspired the creation of the issue no longer applied, meaning `MAX_RECIEVE_NUM` is now expected to remain small instead of being raised.
+Thus, the mainters preferred to keep the simplier implementation rather than bring on the added complexity for menial gains.
 
-**Status:** [Awaiting review / Iterating / Approved / Merged]
-Not Merged
+- 6/17/26: Moved onto a new issue in Agnocast!
+
+**Status:** 
+Not Merged (Issue Closed)
 ---
 
 ## Learnings & Reflections
